@@ -1,0 +1,93 @@
+{
+  "fonte": "INPE Programa Queimadas, CSV mensal Brasil, janeiro-fevereiro de 2025",
+  "qualidade": {
+    "registros_brutos": 104240,
+    "ids_duplicados": 0,
+    "datas_invalidas": 0,
+    "municipios_id_ausentes": 0,
+    "frp_ausente": 2553,
+    "satelites": {
+      "NOAA-21": 28990,
+      "NOAA-20": 28943,
+      "NPP-375": 22431,
+      "GOES-16": 7004,
+      "NPP-375D": 6091,
+      "AQUA_M-T": 4956,
+      "TERRA_M-T": 1808,
+      "METOP-B": 1244,
+      "TERRA_M-M": 1242,
+      "METOP-C": 1090,
+      "AQUA_M-M": 222,
+      "MSG-03": 219
+    }
+  },
+  "satelite_referencia": "AQUA_M-T",
+  "deteccoes_referencia": 4956,
+  "municipios_observados": 1607,
+  "semanas_observadas": 9,
+  "municipio_semanas_com_foco": 2743,
+  "focos_por_mes": {
+    "2025-01": 3137,
+    "2025-02": 1819
+  },
+  "focos_por_bioma": {
+    "Amazônia": 1618,
+    "Cerrado": 1360,
+    "Caatinga": 955,
+    "Mata Atlântica": 876,
+    "Pampa": 98,
+    "Pantanal": 49
+  },
+  "top_10_municipios": [
+    {
+      "municipio": "PACARAIMA",
+      "estado": "RORAIMA",
+      "focos": 73
+    },
+    {
+      "municipio": "NORMANDIA",
+      "estado": "RORAIMA",
+      "focos": 71
+    },
+    {
+      "municipio": "CAROEBE",
+      "estado": "RORAIMA",
+      "focos": 43
+    },
+    {
+      "municipio": "RORAINÓPOLIS",
+      "estado": "RORAIMA",
+      "focos": 39
+    },
+    {
+      "municipio": "BONFIM",
+      "estado": "RORAIMA",
+      "focos": 38
+    },
+    {
+      "municipio": "UIRAMUTÃ",
+      "estado": "RORAIMA",
+      "focos": 37
+    },
+    {
+      "municipio": "CARACARAÍ",
+      "estado": "RORAIMA",
+      "focos": 35
+    },
+    {
+      "municipio": "SÃO DESIDÉRIO",
+      "estado": "BAHIA",
+      "focos": 34
+    },
+    {
+      "municipio": "MONTE ALEGRE",
+      "estado": "PARÁ",
+      "focos": 32
+    },
+    {
+      "municipio": "PRAINHA",
+      "estado": "PARÁ",
+      "focos": 31
+    }
+  ]
+}
