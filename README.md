@@ -11,7 +11,7 @@ Este repositório estuda a priorização semanal de municípios com dados públi
 - `resultados/metricas.csv`: AP, precisão, revocação, F1 e revocação entre os 50 primeiros por semana e método.
 - `resultados/ranking_retrospectivo.csv`: ranking histórico para a semana de 17/02/2025; não é previsão atual.
 - `resultados/resumo.json`: protocolo e resultados estruturados.
-- `artigo_parte3_aguardando_video.pdf`: artigo da Parte 3. O endereço do vídeo será inserido depois da gravação.
+- `artigo_parte3_final.pdf`: artigo final da Parte 3, com os endereços do GitHub e do [vídeo](https://youtu.be/E8u98XAlkQ0).
 - `analise_exploratoria.py`, `artigo_parcial_firewatch_07N.pdf`, `municipio_semana_observado.csv` e `resumo_eda.json`: entrega anterior, Parte 2.
 
 ## Reproduzir
