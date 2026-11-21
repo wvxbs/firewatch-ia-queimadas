@@ -1,30 +1,32 @@
-# FireWatch IA — Parte 2
+# FireWatch IA — experimento retrospectivo
 
-Projeto individual de Gabriel Ferreira (RA 10442043), turma 07N, Inteligência Artificial, Universidade Presbiteriana Mackenzie.
+Projeto de Gabriel Ferreira (RA 10442043), turma 07N, Inteligência Artificial, Universidade Presbiteriana Mackenzie.
 
-Este repositório contém o artigo parcial em PDF, os CSV oficiais do Programa Queimadas do INPE de janeiro e fevereiro de 2025, o script de análise exploratória e seus resultados. O objetivo do projeto completo é prever quais municípios estarão entre os 10% com maior concentração de focos na semana seguinte. **Nenhum modelo preditivo foi treinado nesta etapa.**
+Este repositório documenta um experimento de priorização semanal de municípios a partir de detecções de focos ativos do [Programa Queimadas do INPE](https://www.terrabrasilis.dpi.inpe.br/queimadas/portal/pages/secao_downloads/dados-abertos/index.html). O recorte disponível cobre janeiro e fevereiro de 2025. Trata-se de **avaliação retrospectiva**, sem uso operacional.
 
-## Dados
+## Arquivos
 
-Fonte: [Programa Queimadas do INPE](https://www.terrabrasilis.dpi.inpe.br/queimadas/portal/pages/secao_downloads/dados-abertos/index.html), série mensal Brasil, arquivos baixados em 25/09/2026:
+- `experimento.py`: preparação do painel, treinamento e avaliação temporal.
+- CSV na raiz: arquivos mensais originais de [janeiro](https://dataserver-coids.inpe.br/queimadas/queimadas/focos/csv/mensal/Brasil/focos_mensal_br_202501.csv) e [fevereiro](https://dataserver-coids.inpe.br/queimadas/queimadas/focos/csv/mensal/Brasil/focos_mensal_br_202502.csv) de 2025.
+- `analise_exploratoria.py`, `artigo_parcial_firewatch_07N.pdf`, `municipio_semana_observado.csv` e `resumo_eda.json`: entrega da Parte 2.
+- `resultados/metricas.csv`: AP, precisão, revocação, F1 e revocação entre os 50 primeiros por semana e modelo.
+- `resultados/ranking_retrospectivo.csv`: demonstração histórica para a semana de 17/02/2025.
+- `resultados/resumo.json`: protocolo e resultados em formato estruturado.
+- `artigo_parte3_aguardando_video.pdf`: artigo da Parte 3; substituir pelo PDF com o link do vídeo antes da entrega final.
 
-- [janeiro de 2025](https://dataserver-coids.inpe.br/queimadas/queimadas/focos/csv/mensal/Brasil/focos_mensal_br_202501.csv)
-- [fevereiro de 2025](https://dataserver-coids.inpe.br/queimadas/queimadas/focos/csv/mensal/Brasil/focos_mensal_br_202502.csv)
+## Reproduzir
 
-Os arquivos brutos ficam em `dados/brutos/` na pasta local do projeto e na raiz deste repositório público. Contêm detecções de diversos satélites; a agregação temporal usa apenas `AQUA_M-T` para evitar misturar sensores. `municipio_semana_observado.csv` inclui apenas municípios e semanas com detecção. Ele **não** pode ser usado diretamente para treinar a classificação, pois faltam os pares com zero foco.
-
-## Reproduzir a análise
-
-Requer Python 3 e pandas.
+Requer Python 3.10+.
 
 ```sh
-python3 analise_exploratoria.py
+python3 -m pip install -r requirements.txt
+python3 experimento.py
 ```
 
-O script gera `dados/processados/resumo_eda.json` e `dados/processados/municipio_semana_observado.csv`; cópias desses resultados também estão na raiz para consulta direta. Os CSV de origem têm 104.240 registros; 4.956 pertencem ao satélite de referência, em 1.607 municípios observados e nove semanas de calendário. O código verifica IDs duplicados, datas inválidas, códigos de município ausentes e ausência de FRP.
+O script recria os arquivos em `resultados/`. Ele usa somente `AQUA_M-T` para contar focos; o painel inclui 4.332 municípios encontrados em qualquer satélite nos dois CSV. A classe positiva provisória é o decil superior entre municípios com pelo menos uma detecção na semana alvo, incluindo empates.
 
-## Limites e próximos passos
+## Resultado e limites
 
-O recorte cobre somente janeiro e fevereiro de 2025 e não captura o ciclo sazonal completo. Ainda faltam os dados de 2019–2025, o painel completo de municípios com contagens zero, atributos históricos, treinamento, validação temporal, métricas de desempenho e explicações SHAP. Os números atuais são descritivos de detecções, não da área queimada nem do risco de cada município.
+Em três semanas de teste temporal, a AP média foi 0,0654 para persistência, 0,0798 para regressão logística e 0,0755 para floresta aleatória. O recorte curto, o universo municipal incompleto e o desempenho baixo impedem conclusões sobre utilidade real. A proposta inicial de 2019–2025, XGBoost, SHAP e protótipo não foi concluída neste experimento.
 
-O artigo segue o template da SBC fornecido pela disciplina. A IA generativa OpenAI Codex auxiliou na redação, formatação e elaboração do script; a responsabilidade pelo conteúdo é do estudante.
+Dados de focos não equivalem a área queimada, gravidade ou causa de incêndios. Qualquer aplicação prática exigiria histórico maior, análise regional e revisão humana.
