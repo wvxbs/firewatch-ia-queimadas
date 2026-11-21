@@ -1,7 +1,8 @@
 """FireWatch IA | Gabriel Ferreira | RA 10442043 | turma 07N.
 
-Experimento retrospectivo com dados de janeiro e fevereiro de 2025.
+Experimento retrospectivo com dados de janeiro e fevereiro de 2024 e 2025.
 Histórico: 2026-11-20, Gabriel Ferreira, versão para revisão da Parte 3.
+Histórico: 2026-11-20, Gabriel Ferreira, comparação temporal entre anos.
 """
 
 import csv
@@ -20,14 +21,18 @@ from sklearn.preprocessing import StandardScaler
 
 ROOT = Path(__file__).resolve().parent
 RAW = ROOT / "dados/brutos" if (ROOT / "dados/brutos").exists() else ROOT
-WEEKS = [date(2025, 1, 6) + timedelta(weeks=i) for i in range(7)]
+WEEKS_2024 = [date(2024, 1, 1) + timedelta(weeks=i) for i in range(8)]
+WEEKS_2025 = [date(2025, 1, 6) + timedelta(weeks=i) for i in range(7)]
 
 
 def load_data():
     counts = Counter()
     names = {}
     ids = set()
-    for path in sorted(RAW.glob("focos_mensal_br_20250[12].csv")):
+    paths = sorted(RAW.glob("focos_mensal_br_202[45]0[12].csv"))
+    if len(paths) != 4:
+        raise FileNotFoundError("São necessários os CSV de janeiro e fevereiro de 2024 e 2025")
+    for path in paths:
         with path.open(newline="", encoding="utf-8") as stream:
             for row in csv.DictReader(stream):
                 municipality = row["municipio_id"]
@@ -42,9 +47,9 @@ def load_data():
     return counts, names, sorted(ids)
 
 
-def examples(counts, ids):
+def examples(counts, ids, weeks):
     batches = []
-    for current, target in zip(WEEKS[:-1], WEEKS[1:]):
+    for current, target in zip(weeks[1:-1], weeks[2:]):
         previous = current - timedelta(weeks=1)
         features = np.array([
             [counts[current, municipality], counts[previous, municipality]]
@@ -77,27 +82,27 @@ def score(y, prediction):
 
 def main():
     counts, names, ids = load_data()
-    batches = examples(counts, ids)
+    train_batches = examples(counts, ids, WEEKS_2024)
+    test_batches = examples(counts, ids, WEEKS_2025)
+    x_train = np.concatenate([batch[1] for batch in train_batches])
+    y_train = np.concatenate([batch[2] for batch in train_batches])
+    models = {
+        "logistica": make_pipeline(StandardScaler(), LogisticRegression(max_iter=1000, class_weight="balanced")),
+        "floresta": RandomForestClassifier(n_estimators=100, min_samples_leaf=20, class_weight="balanced", random_state=42),
+    }
+    for model in models.values():
+        model.fit(x_train, y_train)
     rows = []
     last_predictions = None
-    for test_index in range(3, len(batches)):
-        week, x_test, y_test, threshold = batches[test_index]
-        x_train = np.concatenate([batch[1] for batch in batches[:test_index]])
-        y_train = np.concatenate([batch[2] for batch in batches[:test_index]])
-        models = {
-            "logistica": make_pipeline(StandardScaler(), LogisticRegression(max_iter=1000, class_weight="balanced")),
-            "floresta": RandomForestClassifier(n_estimators=100, min_samples_leaf=20, class_weight="balanced", random_state=42),
-        }
+    for week, x_test, y_test, threshold in test_batches:
         predictions = {"persistencia": x_test[:, 0]}
         for name, model in models.items():
-            model.fit(x_train, y_train)
             predictions[name] = model.predict_proba(x_test)[:, 1]
         for name, values in predictions.items():
             rows.append({"semana_alvo": week.isoformat(), "modelo": name,
                          "limiar_focos_classe_positiva": threshold,
                          "positivos": int(y_test.sum()), **score(y_test, values)})
-        if test_index == len(batches) - 1:
-            last_predictions = (week, y_test, predictions)
+        last_predictions = (week, y_test, predictions)
 
     output = ROOT / "resultados"
     output.mkdir(exist_ok=True)
@@ -117,8 +122,9 @@ def main():
                              int(predictions["persistencia"][index])])
     summary = {
         "universo_municipios_observados_em_qualquer_satelite": len(ids),
-        "semanas_completas": [week.isoformat() for week in WEEKS],
-        "protocolo": "validação temporal expansiva; treino nas semanas anteriores e teste em uma semana posterior",
+        "semanas_treino": [week.isoformat() for week in WEEKS_2024],
+        "semanas_teste": [week.isoformat() for week in WEEKS_2025],
+        "protocolo": "treino nas semanas alvo de 2024; teste nas semanas alvo de 2025, sem ajuste no teste",
         "definicao_positivo": "decil superior das contagens positivas por semana; empates incluídos",
         "metrica_principal": "average precision (resumo da curva precisão-revocação)",
         "resultados": rows,
